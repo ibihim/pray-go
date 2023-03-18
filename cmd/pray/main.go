@@ -2,13 +2,12 @@ package main
 
 import (
 	"fmt"
-	"time"
+
+	"github.com/ibihim/pray-go/pkg/cmd"
 )
 
-func getPrayer(year, month, day int) []time.Time {
-
-}
-
 func main() {
-	fmt.Println("vim-go")
+	if err := cmd.PrayerCommand().Execute(); err != nil {
+		fmt.Println(err)
+	}
 }

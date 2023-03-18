@@ -1,0 +1,91 @@
+{
+  "code": 200,
+  "status": "OK",
+  "data": {
+    "timings": {
+      "Fajr": "04:44",
+      "Sunrise": "06:18",
+      "Dhuhr": "12:16",
+      "Asr": "15:27",
+      "Sunset": "18:15",
+      "Maghrib": "18:15",
+      "Isha": "19:50",
+      "Imsak": "04:34",
+      "Midnight": "00:17",
+      "Firstthird": "22:16",
+      "Lastthird": "02:17"
+    },
+    "date": {
+      "readable": "17 Mar 2023",
+      "timestamp": "1679032800",
+      "hijri": {
+        "date": "24-08-1444",
+        "format": "DD-MM-YYYY",
+        "day": "24",
+        "weekday": {
+          "en": "Al Juma'a",
+          "ar": "الجمعة"
+        },
+        "month": {
+          "number": 8,
+          "en": "Shaʿbān",
+          "ar": "شَعْبان"
+        },
+        "year": "1444",
+        "designation": {
+          "abbreviated": "AH",
+          "expanded": "Anno Hegirae"
+        },
+        "holidays": []
+      },
+      "gregorian": {
+        "date": "17-03-2023",
+        "format": "DD-MM-YYYY",
+        "day": "17",
+        "weekday": {
+          "en": "Friday"
+        },
+        "month": {
+          "number": 3,
+          "en": "March"
+        },
+        "year": "2023",
+        "designation": {
+          "abbreviated": "AD",
+          "expanded": "Anno Domini"
+        }
+      }
+    },
+    "meta": {
+      "latitude": 52.573884,
+      "longitude": 13.082137,
+      "timezone": "Europe/Berlin",
+      "method": {
+        "id": 2,
+        "name": "Islamic Society of North America (ISNA)",
+        "params": {
+          "Fajr": 15,
+          "Isha": 15
+        },
+        "location": {
+          "latitude": 39.70421229999999,
+          "longitude": -86.39943869999999
+        }
+      },
+      "latitudeAdjustmentMethod": "ANGLE_BASED",
+      "midnightMode": "STANDARD",
+      "school": "STANDARD",
+      "offset": {
+        "Imsak": 0,
+        "Fajr": 0,
+        "Sunrise": 0,
+        "Dhuhr": 0,
+        "Asr": 0,
+        "Maghrib": 0,
+        "Sunset": 0,
+        "Isha": 0,
+        "Midnight": 0
+      }
+    }
+  }
+}
