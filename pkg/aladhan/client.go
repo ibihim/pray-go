@@ -1,4 +1,4 @@
-package client
+package aladhan
 
 import (
 	"encoding/json"
@@ -9,19 +9,17 @@ import (
 	"time"
 
 	"k8s.io/klog/v2"
-
-	"github.com/ibihim/pray-go/api"
 )
 
 // GetCalendarByCity returns the prayer times for a given month and city (country).
-func GetCalendarByCity(t time.Time, city, country string, method int) ([]api.Data, error) {
+func GetCalendarByCity(t time.Time, city, country string, method int) ([]*Data, error) {
 	return GetCalendarByCityWithClient(http.Client{}, t, city, country, method)
 }
 
 // GetCalendarByCityWithClient returns the prayer times for a given month and cit (country).
-func GetCalendarByCityWithClient(client http.Client, t time.Time, city, country string, method int) ([]api.Data, error) {
+func GetCalendarByCityWithClient(client http.Client, t time.Time, city, country string, method int) ([]*Data, error) {
 	timeString := t.Format("2006/01")
-	urlStr, err := url.JoinPath(api.CalendarByCityURL, timeString)
+	urlStr, err := url.JoinPath(CalendarByCityURL, timeString)
 	if err != nil {
 		return nil, fmt.Errorf("error joining URL: %w", err)
 	}
@@ -48,7 +46,7 @@ func GetCalendarByCityWithClient(client http.Client, t time.Time, city, country 
 
 	klog.V(4).Infof("Response: %v", res)
 
-	var timings api.CalendarByCity
+	var timings CalendarByCity
 	if err := json.NewDecoder(res.Body).Decode(&timings); err != nil {
 		return nil, fmt.Errorf("error decoding response: %w", err)
 	}
@@ -59,15 +57,15 @@ func GetCalendarByCityWithClient(client http.Client, t time.Time, city, country 
 }
 
 // GetTimingsByCity returns the prayer times for a given day, city and country.
-func GetTimingsByCity(t time.Time, city, country string, method int) ([]api.Data, error) {
+func GetTimingsByCity(t time.Time, city, country string, method int) (*Data, error) {
 	return GetTimingsByCityWithClient(http.Client{}, t, city, country, method)
 }
 
 // GetTimingsByCityWithClient returns the prayer times for a given day, city and
 // country using a custom HTTP client.
-func GetTimingsByCityWithClient(client http.Client, t time.Time, city, country string, method int) ([]api.Data, error) {
+func GetTimingsByCityWithClient(client http.Client, t time.Time, city, country string, method int) (*Data, error) {
 	timeString := t.Format("02-01-2006")
-	urlStr, err := url.JoinPath(api.TimingsByCityURL, timeString)
+	urlStr, err := url.JoinPath(TimingsByCityURL, timeString)
 	if err != nil {
 		return nil, fmt.Errorf("error joining URL: %w", err)
 	}
@@ -94,21 +92,21 @@ func GetTimingsByCityWithClient(client http.Client, t time.Time, city, country s
 
 	klog.V(4).Infof("Response: %v", res)
 
-	var timings api.TimingsByCity
+	var timings TimingsByCity
 	if err := json.NewDecoder(res.Body).Decode(&timings); err != nil {
 		return nil, fmt.Errorf("error decoding response: %w", err)
 	}
 
 	klog.V(4).Infof("Timings: %s", timings.String())
 
-	return []api.Data{timings.Data}, nil
+	return &timings.Data, nil
 }
 
 // CreateURL creates a URL for the TimingsByCity API based on the given date,
 // city, country and method.
 func CreateURL(t time.Time, city, country string, method int) (*url.URL, error) {
 	timeString := t.Format("02-01-2006")
-	urlStr, err := url.JoinPath(api.TimingsByCityURL, timeString)
+	urlStr, err := url.JoinPath(TimingsByCityURL, timeString)
 	if err != nil {
 		return nil, fmt.Errorf("error joining URL: %w", err)
 	}

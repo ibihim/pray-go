@@ -3,13 +3,16 @@ package cmd
 import (
 	"flag"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/spf13/cobra"
 	klog "k8s.io/klog/v2"
 
-	"github.com/ibihim/pray-go/pkg/client"
+	"github.com/ibihim/pray-go/pkg/aladhan"
+	"github.com/ibihim/pray-go/pkg/api"
 	"github.com/ibihim/pray-go/pkg/prayer"
+	"github.com/ibihim/pray-go/pkg/store"
 )
 
 const (
@@ -66,20 +69,48 @@ func PrayerCommand() *cobra.Command {
 
 func RunNextPrayer(city, country string, cache bool) error {
 	today := time.Now()
-	todayPrayers, err := client.GetTimingsByCity(today, city, country, 2)
+
+	storedPrayers, err := store.GetAll()
+	if err != nil && !os.IsNotExist(err) {
+		return fmt.Errorf("Couldn't get stored prayers: %v", err)
+	}
+
+	todaysPrayers, err := storedPrayers.Get(api.ToDay(today))
+	if err != nil {
+		return fmt.Errorf("Couldn't get today's prayers: %v", err)
+	}
+	if todaysPrayers != nil {
+		prayer, err := prayer.Next(todaysPrayers)
+		if err != nil {
+			return fmt.Errorf("Couldn't get next prayer: %v", err)
+		}
+
+		fmt.Println(prayer)
+	}
+
+	monthsPrayers, err := aladhan.GetCalendarByCity(today, city, country, 2)
 	if err != nil {
 		return err
 	}
 
-	tomorrow := time.Now().AddDate(0, 0, 1)
-	tomorrowPrayers, err := client.GetTimingsByCity(tomorrow, city, country, 2)
+	// Get the next month's first day's prayer times.
+	// This is necessary in case that today is the last day of the month append
+	// the next prayer happens tomorrow.
+	year, month, _ := today.Date()
+	nextMonth := time.Date(year, month+1, 1, 0, 0, 0, 0, time.UTC)
+	nextMonthsFirstPrayers, err := aladhan.GetTimingsByCity(nextMonth, city, country, 2)
 	if err != nil {
 		return err
 	}
 
-	klog.V(4).Infof("Timings: %v", todayPrayers)
+	klog.V(4).Infof("Timings: %v", nextMonth)
 
-	prayer, err := prayer.Next(today, append(todayPrayers, tomorrowPrayers...))
+	prayers, err := aladhan.CalendarToPrayerTimes(append(monthsPrayers, nextMonthsFirstPrayers))
+	if err != nil {
+		return fmt.Errorf("Couldn't convert calendar to prayer times: %v", err)
+	}
+
+	prayer, err := prayer.Next(prayers)
 	if err != nil {
 		return err
 	}

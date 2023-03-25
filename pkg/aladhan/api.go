@@ -1,4 +1,4 @@
-package api
+package aladhan
 
 import "encoding/json"
 
@@ -9,9 +9,9 @@ const (
 
 // CalendarByCity is the main struct for the CalendarByCity API response
 type CalendarByCity struct {
-	Code   int    `json:"code"`
-	Status string `json:"status"`
-	Data   []Data `json:"data"`
+	Code   int     `json:"code"`
+	Status string  `json:"status"`
+	Data   []*Data `json:"data"`
 }
 
 func (c *CalendarByCity) String() string {
