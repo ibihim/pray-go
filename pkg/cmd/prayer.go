@@ -16,9 +16,9 @@ import (
 )
 
 const (
-	city    = "city"
-	country = "country"
-	cache   = "cache"
+	city   = "city"
+	nation = "nation"
+	cache  = "cache"
 )
 
 func PrayerCommand() *cobra.Command {
@@ -45,7 +45,7 @@ func PrayerCommand() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			country, err := cmd.Flags().GetString(country)
+			country, err := cmd.Flags().GetString(nation)
 			if err != nil {
 				return err
 			}
@@ -59,7 +59,7 @@ func PrayerCommand() *cobra.Command {
 	}
 
 	nextCmd.Flags().StringP(city, "c", "Berlin", "City name")
-	nextCmd.Flags().StringP(country, "C", "Germany", "Country name")
+	nextCmd.Flags().StringP(nation, "n", "Germany", "Country name")
 	nextCmd.Flags().BoolP(cache, "s", true, "Cache the prayer times")
 
 	rootCmd.AddCommand(nextCmd)
@@ -70,6 +70,7 @@ func PrayerCommand() *cobra.Command {
 func RunNextPrayer(city, country string, cache bool) error {
 	today := time.Now()
 
+	// Check for stored prayers. TODO@ibihim make it possible to disable with a flag.
 	storedPrayers, err := store.GetAll()
 	if err != nil && !os.IsNotExist(err) {
 		return fmt.Errorf("Couldn't get stored prayers: %v", err)
