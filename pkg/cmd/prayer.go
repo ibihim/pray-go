@@ -15,9 +15,10 @@ import (
 )
 
 const (
-	city   = "city"
-	nation = "nation"
-	cache  = "cache"
+	city      = "city"
+	nation    = "nation"
+	nocache   = "nocache"
+	listFiles = "list-files"
 )
 
 func PrayerCommand() *cobra.Command {
@@ -48,18 +49,27 @@ func PrayerCommand() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			cache, err := cmd.Flags().GetBool(cache)
+			nocache, err := cmd.Flags().GetBool(nocache)
 			if err != nil {
 				return err
 			}
+			listFiles, err := cmd.Flags().GetBool(listFiles)
+			if err != nil {
+				return err
+			}
+			if listFiles {
+				fmt.Println(store.GetCacheFilePath())
+				return nil
+			}
 
-			return RunNextPrayer(city, country, cache)
+			return RunNextPrayer(city, country, !nocache)
 		},
 	}
 
 	nextCmd.Flags().StringP(city, "c", "Berlin", "City name")
 	nextCmd.Flags().StringP(nation, "n", "Germany", "Country name")
-	nextCmd.Flags().BoolP(cache, "s", true, "Cache the prayer times")
+	nextCmd.Flags().BoolP(nocache, "s", false, "Do not cache the prayer times")
+	nextCmd.Flags().BoolP(listFiles, "l", false, "List all files")
 
 	rootCmd.AddCommand(nextCmd)
 
@@ -68,6 +78,8 @@ func PrayerCommand() *cobra.Command {
 
 func RunNextPrayer(city, country string, cache bool) error {
 	today := time.Now()
+
+	klog.V(4).Infof("Getting prayer for %s, %s with cache: ", city, country, cache)
 
 	if cache {
 		nextPrayer, err := getPrayerFromFile()

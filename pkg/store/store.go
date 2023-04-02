@@ -17,6 +17,11 @@ var (
 	cacheFilePath = filepath.Join(xdg.CacheHome, "pray-go", "data.json")
 )
 
+// GetCacheFilePath returns the path to the cache file.
+func GetCacheFilePath() string {
+	return cacheFilePath
+}
+
 // Get returns the prayer times from the cache file. If the
 // file doesn't exist, it returns nil, nil instead of an error.
 func Get() ([]*api.Prayer, error) {
