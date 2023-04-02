@@ -17,7 +17,8 @@ import (
 const (
 	city      = "city"
 	nation    = "nation"
-	nocache   = "nocache"
+	nonewline = "no-newline"
+	nocache   = "no-cache"
 	listFiles = "list-files"
 )
 
@@ -49,7 +50,11 @@ func PrayerCommand() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			nocache, err := cmd.Flags().GetBool(nocache)
+			noCache, err := cmd.Flags().GetBool(nocache)
+			if err != nil {
+				return err
+			}
+			noNewLine, err := cmd.Flags().GetBool(nonewline)
 			if err != nil {
 				return err
 			}
@@ -62,24 +67,32 @@ func PrayerCommand() *cobra.Command {
 				return nil
 			}
 
-			return RunNextPrayer(city, country, !nocache)
+			return RunNextPrayer(city, country, !noCache, !noNewLine)
 		},
 	}
 
-	nextCmd.Flags().StringP(city, "c", "Berlin", "City name")
-	nextCmd.Flags().StringP(nation, "n", "Germany", "Country name")
-	nextCmd.Flags().BoolP(nocache, "s", false, "Do not cache the prayer times")
-	nextCmd.Flags().BoolP(listFiles, "l", false, "List all files")
+	nextCmd.Flags().String(city, "Berlin", "City name")
+	nextCmd.Flags().String(nation, "Germany", "Country name")
+	nextCmd.Flags().Bool(nocache, false, "Do not cache the prayer times")
+	nextCmd.Flags().Bool(listFiles, false, "List the location of the cache file")
+	nextCmd.Flags().Bool(nonewline, false, "Do not print a newline at the end")
 
 	rootCmd.AddCommand(nextCmd)
 
 	return rootCmd
 }
 
-func RunNextPrayer(city, country string, cache bool) error {
+func RunNextPrayer(city, country string, cache, newline bool) error {
 	today := time.Now()
 
-	klog.V(4).Infof("Getting prayer for %s, %s with cache: ", city, country, cache)
+	klog.V(4).Infof(
+		"Getting prayer for %s, %s with cache: %t, with newline: %t ",
+		city, country, cache, newline,
+	)
+
+	if newline {
+		defer fmt.Println()
+	}
 
 	if cache {
 		nextPrayer, err := getPrayerFromFile()
