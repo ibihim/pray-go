@@ -16,3 +16,6 @@
 
 # Debugging editor
 .vscode
+
+# Buildfile
+prayer
