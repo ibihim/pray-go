@@ -44,7 +44,7 @@ func GetCalendarByCityWithClient(client http.Client, t time.Time, city, country 
 	}
 	defer res.Body.Close()
 
-	klog.V(4).Infof("Response: %v", res)
+	klog.V(8).Infof("Response: %v", res)
 
 	var timings CalendarByCity
 	if err := json.NewDecoder(res.Body).Decode(&timings); err != nil {
@@ -90,7 +90,7 @@ func GetTimingsByCityWithClient(client http.Client, t time.Time, city, country s
 	}
 	defer res.Body.Close()
 
-	klog.V(4).Infof("Response: %v", res)
+	klog.V(8).Infof("Response: %v", res)
 
 	var timings TimingsByCity
 	if err := json.NewDecoder(res.Body).Decode(&timings); err != nil {

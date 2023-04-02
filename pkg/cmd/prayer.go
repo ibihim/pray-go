@@ -3,7 +3,6 @@ package cmd
 import (
 	"flag"
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -70,53 +69,56 @@ func PrayerCommand() *cobra.Command {
 func RunNextPrayer(city, country string, cache bool) error {
 	today := time.Now()
 
-	// Check for stored prayers. TODO@ibihim make it possible to disable with a flag.
-	storedPrayers, err := store.GetAll()
-	if err != nil && !os.IsNotExist(err) {
-		return fmt.Errorf("Couldn't get stored prayers: %v", err)
-	}
+	if cache {
+		nextPrayer, err := getPrayerFromFile()
+		if err == nil {
+			klog.Info("Got prayer from file")
 
-	todaysPrayers, err := storedPrayers.Get(api.ToDay(today))
-	if err != nil {
-		return fmt.Errorf("Couldn't get today's prayers: %v", err)
-	}
-	if todaysPrayers != nil {
-		prayer, err := prayer.Next(todaysPrayers)
-		if err != nil {
-			return fmt.Errorf("Couldn't get next prayer: %v", err)
+			fmt.Printf(nextPrayer.ClockString())
+			return nil
 		}
 
-		fmt.Println(prayer)
+		klog.V(4).Infof("Failed to get prayer from file: %v", err)
 	}
 
-	monthsPrayers, err := aladhan.GetCalendarByCity(today, city, country, 2)
+	prayers, err := aladhan.GetPrayers(today, city, country, 2)
 	if err != nil {
 		return err
 	}
 
-	// Get the next month's first day's prayer times.
-	// This is necessary in case that today is the last day of the month append
-	// the next prayer happens tomorrow.
-	year, month, _ := today.Date()
-	nextMonth := time.Date(year, month+1, 1, 0, 0, 0, 0, time.UTC)
-	nextMonthsFirstPrayers, err := aladhan.GetTimingsByCity(nextMonth, city, country, 2)
+	klog.V(4).Infof("Got prayers from API: %v", prayers)
+
+	nextPrayers, err := prayer.NextPrayers(prayers)
 	if err != nil {
 		return err
 	}
 
-	klog.V(4).Infof("Timings: %v", nextMonth)
+	klog.V(4).Infof("Got next prayers: %v", nextPrayers)
 
-	prayers, err := aladhan.CalendarToPrayerTimes(append(monthsPrayers, nextMonthsFirstPrayers))
-	if err != nil {
-		return fmt.Errorf("Couldn't convert calendar to prayer times: %v", err)
+	fmt.Printf(nextPrayers[0].ClockString())
+
+	if !cache {
+		return nil
 	}
 
-	prayer, err := prayer.Next(prayers)
-	if err != nil {
-		return err
-	}
+	klog.V(4).Infof("Storing prayers: %v", prayers)
 
-	fmt.Printf(prayer)
+	if err := store.Store(prayers); err != nil {
+		return fmt.Errorf("failed to store prayers: %w", err)
+	}
 
 	return nil
+}
+
+func getPrayerFromFile() (*api.Prayer, error) {
+	prayers, err := store.Get()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get stored prayers: %w", err)
+	}
+
+	if len(prayers) == 0 {
+		return nil, fmt.Errorf("no stored prayers found")
+	}
+
+	return prayer.NextPrayer(prayers)
 }
