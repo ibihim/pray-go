@@ -72,7 +72,7 @@ func RunNextPrayer(city, country string, cache bool) error {
 	if cache {
 		nextPrayer, err := getPrayerFromFile()
 		if err == nil {
-			klog.Info("Got prayer from file")
+			klog.V(4).Info("Got prayer from file")
 
 			fmt.Printf(nextPrayer.ClockString())
 			return nil
