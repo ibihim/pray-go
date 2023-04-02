@@ -1,4 +1,4 @@
-.PHONY: help build install test run watch-test watch-run clean
+.PHONY: help build build-all build-macos-amd64 build-macos-aarch64 build-linux-amd64 build-linux-aarch64 install test run watch-test watch-run clean
 
 BINARY_NAME := prayer
 GOBIN ?= $(shell go env GOPATH)/bin
@@ -8,20 +8,43 @@ help:
 	@echo "Usage: make [TARGET]"
 	@echo ""
 	@echo "Targets:"
-	@echo "  help        Show this help message"
-	@echo "  build       Build the $(BINARY_NAME) binary"
-	@echo "  install     Install the $(BINARY_NAME) binary to $(GOBIN)"
-	@echo "  test        Run tests"
-	@echo "  run         Run the application"
-	@echo "  watch-test  Watch for file changes and run tests"
-	@echo "  watch-run   Watch for file changes and run the application"
-	@echo "  clean       Clean up the $(BINARY_NAME) binary"
+	@echo "  help                Show this help message"
+	@echo "  build               Build the $(BINARY_NAME) binary for current platform"
+	@echo "  build-all           Build the $(BINARY_NAME) binary for all platforms"
+	@echo "  build-macos-amd64   Build the $(BINARY_NAME) binary for macOS amd64"
+	@echo "  build-macos-aarch64 Build the $(BINARY_NAME) binary for macOS aarch64"
+	@echo "  build-linux-amd64   Build the $(BINARY_NAME) binary for Linux amd64"
+	@echo "  build-linux-aarch64 Build the $(BINARY_NAME) binary for Linux aarch64"
+	@echo "  install             Install the $(BINARY_NAME) binary to $(GOBIN)"
+	@echo "  test                Run tests"
+	@echo "  run                 Run the application"
+	@echo "  watch-test          Watch for file changes and run tests"
+	@echo "  watch-run           Watch for file changes and run the application"
+	@echo "  clean               Clean up the $(BINARY_NAME) binary"
 
 build: clean
 	@echo "Building $(BINARY_NAME)..."
 	@go build -o $(BINARY_NAME) $(MAIN_PATH)
 
-install: build clean
+build-all: build-macos-amd64 build-macos-aarch64 build-linux-amd64 build-linux-aarch64
+
+build-macos-amd64:
+	@echo "Building $(BINARY_NAME) for macOS amd64..."
+	GOOS=darwin GOARCH=amd64 go build -o $(BINARY_NAME)-macos-amd64 $(MAIN_PATH)
+
+build-macos-aarch64:
+	@echo "Building $(BINARY_NAME) for macOS aarch64..."
+	GOOS=darwin GOARCH=arm64 go build -o $(BINARY_NAME)-macos-aarch64 $(MAIN_PATH)
+
+build-linux-amd64:
+	@echo "Building $(BINARY_NAME) for Linux amd64..."
+	GOOS=linux GOARCH=amd64 go build -o $(BINARY_NAME)-linux-amd64 $(MAIN_PATH)
+
+build-linux-aarch64:
+	@echo "Building $(BINARY_NAME) for Linux aarch64..."
+	GOOS=linux GOARCH=arm64 go build -o $(BINARY_NAME)-linux-aarch64 $(MAIN_PATH)
+
+install: build
 	@echo "Installing $(BINARY_NAME) to $(GOBIN)..."
 	@mv $(BINARY_NAME) $(GOBIN)
 

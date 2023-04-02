@@ -17,5 +17,5 @@
 # Debugging editor
 .vscode
 
-# Buildfile
-prayer
+# Buildfiles
+prayer*
