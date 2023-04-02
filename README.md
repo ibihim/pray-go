@@ -13,9 +13,28 @@ I don't take blame for missed prayers.
   prayer next [flags]
 
 Flags:
-  -c, --city string     City name (default "Berlin")
+      --city string     City name (default "Berlin")
   -h, --help            help for next
-  -l, --list-files      List all files
-  -n, --nation string   Country name (default "Germany")
-  -s, --nocache         Do not cache the prayer times
+      --list-files      List the location of the cache file
+      --nation string   Country name (default "Germany")
+      --no-cache        Do not cache the prayer times
+      --no-newline      Do not print a newline at the end
 ```
+Usage: make [TARGET]
+
+## Install
+
+You currently need a local Go development environment.
+
+```
+Targets:
+  help        Show this help message
+  build       Build the prayer binary
+  install     Install the prayer binary to /home/ibihim/go/bin
+  test        Run tests
+  run         Run the application
+  watch-test  Watch for file changes and run tests
+  watch-run   Watch for file changes and run the application
+  clean       Clean up the prayer binary
+```
+
